@@ -46,6 +46,18 @@ function preloadSprites() {
     speed: 7,
   });
   
+  sprites.playerBubble = new SpeechBubble({
+    parent: sprites.player,
+    y: 190
+  });
+  
+  sprites.catBubble = new SpeechBubble({
+    parent: sprites.cat,
+    y: 190
+  });
+  
+  // INTERACTIBLES
+  
   let interactFrames = {"default": loadImage("assets/prompt.png")};
   
   sprites.barDoorHotspot = new Interactible({
@@ -76,7 +88,7 @@ function preloadScenes() {
     camxMax: 4100/2,
     floor: 451
   });
-  scenes.town.addSprites([sprites.barDoorHotspot, sprites.cat]);
+  scenes.town.addSprites([sprites.barDoorHotspot, sprites.cat, sprites.playerBubble, sprites.catBubble]);
   
   scenes.bar = new Scene({
     background: loadImage("assets/bar.png"),

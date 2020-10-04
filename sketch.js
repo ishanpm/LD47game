@@ -246,6 +246,48 @@ class Interactible extends Sprite {
   }
 }
 
+class SpeechBubble extends Sprite {
+  constructor(config) {
+    super(config);
+    
+    this.parent = config.parent;
+    this.invisible = true;
+    this.text = "foo";
+    
+    this.y = config.y || 50;
+    this.width = 200;
+    this.height = 70;
+  }
+  
+  tick() {
+    super.tick();
+  }
+  
+  draw() {
+    if (!this.invisible) {
+      push();
+      
+      let x = this.parent.x - this.width/2;
+      let y = this.y - this.height;
+      
+      fill(245);
+      stroke(0);
+      strokeWeight(3);
+      rect(x, y, this.width, this.height);
+      
+      fill(0);
+      noStroke();
+      textAlign(CENTER, CENTER);
+      textSize(20);
+      text(this.text, x, y, this.width, this.height);
+      
+      pop();
+    }
+    
+    super.draw();
+  }
+}
+
 class Character extends Sprite {
   constructor(config) {
     super(config);
@@ -314,6 +356,8 @@ function setup() {
 function draw() {
   input.tick();
   
+  conversation.tick();
+  
   background(245);
   
   if (nextScene) {
@@ -326,6 +370,7 @@ function draw() {
   } else {
     fadeout = constrain(fadeout-10, 0, 255);
   }
+  
   
   if (currentScene) {
     currentScene.tick();
