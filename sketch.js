@@ -127,7 +127,10 @@ class Sprite {
   constructor(config) {
     this.scene = null;
     this.frames = config.frames || {};
+    this.animations = config.animations || {};
     this.curFrame = "default";
+    this.curAnimation = null;
+    this.animationProgress = 0;
     this.zOrder = 0;
     
     this.invisible = config.invisible || false;
@@ -139,7 +142,42 @@ class Sprite {
     this.y = config.y || 0;
   }
   
-  tick() {}
+  startAnimation(id) {
+    this.curAnimation = null;
+    
+    if (this.animations[id]) {
+      this.curAnimation = this.animations[id];
+      
+      this.animationProgress = 0;
+      this.curFrame = this.curAnimation.ids[0];
+    } else if (this.frames[id]) {
+      this.curFrame = id;
+    } else {
+      console.error(`Unknown animation ${id} in sprite`, this);
+    }
+  }
+  
+  tick() {
+    // Update anmation
+    if (this.curAnimation !== null && !this.invisible) {
+      let anim = this.curAnimation;
+      let period = anim.period || 1;
+      let idx = Math.floor((this.animationProgress / period) * anim.ids.length);
+      idx = constrain(idx, 0, anim.ids.length-1);
+      
+      this.curFrame = anim.ids[idx];
+      
+      this.animationProgress += 1;
+      
+      if (this.animationProgress >= anim.period) {
+        if (anim.loop) {
+          this.animationProgress -= anim.period;
+        } else {
+          this.curAnimation = null;
+        }
+      }
+    }
+  }
   
   draw() {
     if (this.invisible) return;
@@ -215,35 +253,27 @@ class Character extends Sprite {
     this.walkFrames = config.walkFrames;
     this.dx = 0;
     this.walking = false;
-    this.walkCycle = 0;
-    this.walkPeriod = config.walkPeriod || 50;
   }
   
   tick() {
     // Start/end walk cycle
     if (this.dx !== 0 && !this.walking) {
       this.walking = true;
-      this.walkCycle = 0;
+      this.startAnimation("walk");
     } else if (this.dx === 0 && this.walking) {
       this.walking = false;
-      this.curFrame = "default";
+      this.startAnimation("default");
     }
     
     // Advance walk cycle
     if (this.walking) {
-      let idx = Math.floor((this.walkCycle / this.walkPeriod) * this.walkFrames);
-      
-      this.curFrame = "walk"+idx;
-      
-      this.walkCycle += 1;
-      if (this.walkCycle >= this.walkPeriod) {
-        this.walkCycle = 0;
-      }
       
       this.flipx = (this.dx > 0);
     }
     
     this.x += this.dx;
+    
+    super.tick();
   }
 }
 

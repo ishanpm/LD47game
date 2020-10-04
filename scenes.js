@@ -2,18 +2,47 @@ function preloadSprites() {
   sprites.player = new Player({
     frames: {
       "default": loadImage("assets/Dunnet Walk Cycle_0006.png"),
-      "walk0":   loadImage("assets/Dunnet Walk Cycle_0007.png"),
-      "walk1":   loadImage("assets/Dunnet Walk Cycle_0000.png"),
-      "walk2":   loadImage("assets/Dunnet Walk Cycle_0001.png"),
-      "walk3":   loadImage("assets/Dunnet Walk Cycle_0002.png"),
-      "walk4":   loadImage("assets/Dunnet Walk Cycle_0003.png"),
-      "walk5":   loadImage("assets/Dunnet Walk Cycle_0004.png"),
-      "walk6":   loadImage("assets/Dunnet Walk Cycle_0005.png"),
-      "walk7":   loadImage("assets/Dunnet Walk Cycle_0006.png")
+      "walk0":   loadImage("assets/Dunnet Walk Cycle_0000.png"),
+      "walk1":   loadImage("assets/Dunnet Walk Cycle_0001.png"),
+      "walk2":   loadImage("assets/Dunnet Walk Cycle_0002.png"),
+      "walk3":   loadImage("assets/Dunnet Walk Cycle_0003.png"),
+      "walk4":   loadImage("assets/Dunnet Walk Cycle_0004.png"),
+      "walk5":   loadImage("assets/Dunnet Walk Cycle_0005.png"),
+      "walk6":   loadImage("assets/Dunnet Walk Cycle_0006.png"),
+      "walk7":   loadImage("assets/Dunnet Walk Cycle_0007.png")
     },
-    walkFrames: 8,
+    animations: {
+      "walk": {
+        ids: ["walk7", "walk0", "walk1", "walk2", "walk3", "walk4", "walk5", "walk6"],
+        period: 50,
+        loop: true
+      }
+    },
     scale: 0.5,
-    y: 451,
+    speed: 7,
+  });
+  
+  sprites.cat = new Character({
+    frames: {
+      "default": loadImage("assets/cat.png"),
+      "startle":   loadImage("assets/cat-startle.png"),
+      "scream1":   loadImage("assets/cat-scream1.png"),
+      "scream2":   loadImage("assets/cat-scream2.png")
+    },
+    animations: {
+      "startle": {
+        ids: ["startle"],
+        loop: false
+      },
+      "panic": {
+        ids: ["scream1", "scream2"],
+        period: 8,
+        loop: true
+      }
+    },
+    x: 1812,
+    y: 453,
+    scale: 0.5,
     speed: 7,
   });
   
@@ -47,7 +76,7 @@ function preloadScenes() {
     camxMax: 4100/2,
     floor: 451
   });
-  scenes.town.addSprites([sprites.barDoorHotspot]);
+  scenes.town.addSprites([sprites.barDoorHotspot, sprites.cat]);
   
   scenes.bar = new Scene({
     background: loadImage("assets/bar.png"),
