@@ -65,9 +65,9 @@ let conversation = new ConversationManager();
 
 conversation.data = {
   occult: [
+    {who: "cat", anim: "nervous", next: true},
     {who: "player", say: "I can... read your mind."},
-    {who: "cat", anim: "startle", say: "WHAT"},
-    {who: "cat", anim: "panic", say: "AAAAAAAA"},
+    {who: "cat", anim: "jump", say: "WHAT"},
     {who: "cat", anim: "default", next: true},
   ]
 }
