@@ -1,12 +1,18 @@
 let SCREENW = 960;
 let SCREENH = 600;
 
+/** @type {Object.<string, Scene>} */
 let scenes = {};
+/** @type {Object.<string, Sprite>} */
 let sprites = {};
+/** @type {Scene} */
 let currentScene;
+/** @type {?Scene} */
 let nextScene = null;
-let nextScenePlayerX = null;
-let nextScenePlayerFlip = null;
+/** @type {number} */
+let nextScenePlayerX = 0;
+/** @type {boolean} */
+let nextScenePlayerFlip = false;
 let fadeout = 0;
 
 let currentDaytime = 0;
@@ -50,6 +56,11 @@ class Scene {
     } else {
       console.warn("Tried to remove sprite not in scene:", spr);
     }
+  }
+
+  removeAllSprites() {
+    this.sprites = [];
+    this.toRemove = [];
   }
   
   invalidateSpriteOrder() {
@@ -348,6 +359,7 @@ function setup() {
   createCanvas(SCREENW,SCREENH);
   pixelDensity(window.devicePixelRatio);
   
+  setupScenes(0);
   setScene("town", 100);
   
   fadeout = 255;

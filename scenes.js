@@ -13,7 +13,30 @@ function preloadSprites() {
     },
     animations: {
       "walk": {
-        ids: ["walk7", "walk0", "walk1", "walk2", "walk3", "walk4", "walk5", "walk6"],
+        ids: ["walk0", "walk1", "walk2", "walk3", "walk4", "walk5", "walk6", "walk7"],
+        period: 50,
+        loop: true
+      }
+    },
+    scale: 0.5,
+    speed: 7,
+  });
+
+  sprites.dottie = new Character({
+    frames: {
+      "default": loadImage("assets/anim/Dottie_Walk_0002.png"),
+      "walk0":   loadImage("assets/anim/Dottie_Walk_0000.png"),
+      "walk1":   loadImage("assets/anim/Dottie_Walk_0001.png"),
+      "walk2":   loadImage("assets/anim/Dottie_Walk_0002.png"),
+      "walk3":   loadImage("assets/anim/Dottie_Walk_0003.png"),
+      "walk4":   loadImage("assets/anim/Dottie_Walk_0004.png"),
+      "walk5":   loadImage("assets/anim/Dottie_Walk_0005.png"),
+      "walk6":   loadImage("assets/anim/Dottie_Walk_0006.png"),
+      "walk7":   loadImage("assets/anim/Dottie_Walk_0007.png")
+    },
+    animations: {
+      "walk": {
+        ids: ["walk0", "walk1", "walk2", "walk3", "walk4", "walk5", "walk6", "walk7"],
         period: 50,
         loop: true
       }
@@ -126,7 +149,13 @@ function preloadScenes() {
     camxMax: 4100/2,
     floor: 451
   });
-  scenes.town.addSprites([sprites.alleyHotspot, sprites.barDoorHotspot, sprites.marketDoorHotspot, sprites.parkGateHotspot, sprites.cat, sprites.playerBubble, sprites.catBubble]);
+
+  scenes.alley = new Scene({
+    background: loadImage("assets/env/Alley.png"),
+    scale: 0.5,
+    camxMax: 3173/2,
+    floor: 534
+  });
   
   scenes.bar = new Scene({
     background: loadImage("assets/env/Bar.png"),
@@ -134,7 +163,6 @@ function preloadScenes() {
     camxMax: 4200/2,
     floor: 534
   });
-  scenes.bar.addSprites([sprites.barDoorHotspotInside]);
   
   scenes.market = new Scene({
     background: loadImage("assets/env/Market.png"),
@@ -142,5 +170,42 @@ function preloadScenes() {
     camxMax: 3168/2,
     floor: 534
   });
+
+  scenes.park = new Scene({
+    background: loadImage("assets/env/Park.png"),
+    scale: 0.5,
+    camxMax: 3480/2,
+    floor: 534
+  });
+
+  scenes.vip = new Scene({});
+
+  scenes.office = new Scene({
+    background: loadImage("assets/env/Office.png"),
+    scale: 0.5,
+    camxMax: 1920/2,
+    floor: 534
+  });
+}
+
+function setupScenes(time) {
+  // Remove everything
+  scenes.town.removeAllSprites();
+  scenes.alley.removeAllSprites();
+  scenes.bar.removeAllSprites();
+  scenes.market.removeAllSprites();
+  scenes.park.removeAllSprites();
+  scenes.vip.removeAllSprites();
+  scenes.office.removeAllSprites();
+
+  // Add common sprites
+  scenes.town.addSprites([
+    sprites.alleyHotspot,
+    sprites.barDoorHotspot,
+    sprites.marketDoorHotspot,
+    sprites.parkGateHotspot
+  ]);
+  scenes.bar.addSprites([sprites.barDoorHotspotInside]);
   scenes.market.addSprites([sprites.marketDoorHotspotInside]);
+  
 }
