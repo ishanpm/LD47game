@@ -60,12 +60,42 @@ function preloadSprites() {
   
   let interactFrames = {"default": loadImage("assets/prompt.png")};
   
+  sprites.alleyHotspot = new Interactible({
+    frames: interactFrames,
+    x: 182,
+    y: 194,
+    radius: 100,
+    targetScene: "alley",
+    targetX: 2000,
+    targetFacing: false
+  })
+  
   sprites.barDoorHotspot = new Interactible({
     frames: interactFrames,
-    x: 781,
-    y: 163,
+    x: 789,
+    y: 194,
     radius: 100,
     targetScene: "bar",
+    targetX: 2000,
+    targetFacing: false
+  })
+  
+  sprites.marketDoorHotspot = new Interactible({
+    frames: interactFrames,
+    x: 1311,
+    y: 194,
+    radius: 100,
+    targetScene: "market",
+    targetX: 1482,
+    targetFacing: false
+  })
+  
+  sprites.parkGateHotspot = new Interactible({
+    frames: interactFrames,
+    x: 1801,
+    y: 194,
+    radius: 100,
+    targetScene: "park",
     targetX: 2000,
     targetFacing: false
   })
@@ -79,6 +109,16 @@ function preloadSprites() {
     targetX: 781,
     targetFacing: false
   })
+  
+  sprites.marketDoorHotspotInside = new Interactible({
+    frames: interactFrames,
+    x: 1559,
+    y: 253,
+    radius: 100,
+    targetScene: "town",
+    targetX: 1331,
+    targetFacing: false
+  })
 }
 
 function preloadScenes() {
@@ -88,7 +128,7 @@ function preloadScenes() {
     camxMax: 4100/2,
     floor: 451
   });
-  scenes.town.addSprites([sprites.barDoorHotspot, sprites.cat, sprites.playerBubble, sprites.catBubble]);
+  scenes.town.addSprites([sprites.alleyHotspot, sprites.barDoorHotspot, sprites.marketDoorHotspot, sprites.parkGateHotspot, sprites.cat, sprites.playerBubble, sprites.catBubble]);
   
   scenes.bar = new Scene({
     background: loadImage("assets/bar.png"),
@@ -97,4 +137,12 @@ function preloadScenes() {
     floor: 534
   });
   scenes.bar.addSprites([sprites.barDoorHotspotInside]);
+  
+  scenes.market = new Scene({
+    background: loadImage("assets/Market.png"),
+    scale: 0.5,
+    camxMax: 3168/2,
+    floor: 534
+  });
+  scenes.market.addSprites([sprites.marketDoorHotspotInside]);
 }
