@@ -1,15 +1,15 @@
 function preloadSprites() {
   sprites.player = new Player({
     frames: {
-      "default": loadImage("assets/Dunnet Walk Cycle_0006.png"),
-      "walk0":   loadImage("assets/Dunnet Walk Cycle_0000.png"),
-      "walk1":   loadImage("assets/Dunnet Walk Cycle_0001.png"),
-      "walk2":   loadImage("assets/Dunnet Walk Cycle_0002.png"),
-      "walk3":   loadImage("assets/Dunnet Walk Cycle_0003.png"),
-      "walk4":   loadImage("assets/Dunnet Walk Cycle_0004.png"),
-      "walk5":   loadImage("assets/Dunnet Walk Cycle_0005.png"),
-      "walk6":   loadImage("assets/Dunnet Walk Cycle_0006.png"),
-      "walk7":   loadImage("assets/Dunnet Walk Cycle_0007.png")
+      "default": loadImage("assets/still/Dunnet_Standing.png"),
+      "walk0":   loadImage("assets/anim/Dunnet Walk Cycle_0000.png"),
+      "walk1":   loadImage("assets/anim/Dunnet Walk Cycle_0001.png"),
+      "walk2":   loadImage("assets/anim/Dunnet Walk Cycle_0002.png"),
+      "walk3":   loadImage("assets/anim/Dunnet Walk Cycle_0003.png"),
+      "walk4":   loadImage("assets/anim/Dunnet Walk Cycle_0004.png"),
+      "walk5":   loadImage("assets/anim/Dunnet Walk Cycle_0005.png"),
+      "walk6":   loadImage("assets/anim/Dunnet Walk Cycle_0006.png"),
+      "walk7":   loadImage("assets/anim/Dunnet Walk Cycle_0007.png")
     },
     animations: {
       "walk": {
@@ -24,21 +24,19 @@ function preloadSprites() {
   
   sprites.cat = new Character({
     frames: {
-      "default": loadImage("assets/cat.png"),
-      "startle":   loadImage("assets/cat-startle.png"),
-      "scream1":   loadImage("assets/cat-scream1.png"),
-      "scream2":   loadImage("assets/cat-scream2.png")
+      "default": loadImage("assets/still/Cat_Happy.png"),
+      "nervous": loadImage("assets/still/Cat_Nervous.png"),
+      "jump1":   loadImage("assets/anim/Cat Jump_0001.png"),
+      "jump2":   loadImage("assets/anim/Cat Jump_0002.png"),
+      "jump3":   loadImage("assets/anim/Cat Jump_0003.png"),
+      "jump4":   loadImage("assets/anim/Cat Jump_0004.png"),
     },
     animations: {
-      "startle": {
-        ids: ["startle"],
+      "jump": {
+        ids: ["jump1","jump2","jump3","jump4"],
+        period: 20,
         loop: false
       },
-      "panic": {
-        ids: ["scream1", "scream2"],
-        period: 8,
-        loop: true
-      }
     },
     x: 1812,
     y: 453,
@@ -123,7 +121,7 @@ function preloadSprites() {
 
 function preloadScenes() {
   scenes.town = new Scene({
-    background: loadImage("assets/town.png"),
+    background: loadImage("assets/env/Town.png"),
     scale: 0.5,
     camxMax: 4100/2,
     floor: 451
@@ -131,7 +129,7 @@ function preloadScenes() {
   scenes.town.addSprites([sprites.alleyHotspot, sprites.barDoorHotspot, sprites.marketDoorHotspot, sprites.parkGateHotspot, sprites.cat, sprites.playerBubble, sprites.catBubble]);
   
   scenes.bar = new Scene({
-    background: loadImage("assets/bar.png"),
+    background: loadImage("assets/env/Bar.png"),
     scale: 0.5,
     camxMax: 4200/2,
     floor: 534
@@ -139,7 +137,7 @@ function preloadScenes() {
   scenes.bar.addSprites([sprites.barDoorHotspotInside]);
   
   scenes.market = new Scene({
-    background: loadImage("assets/Market.png"),
+    background: loadImage("assets/env/Market.png"),
     scale: 0.5,
     camxMax: 3168/2,
     floor: 534
