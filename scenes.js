@@ -20,7 +20,10 @@ function preloadSprites() {
     },
     scale: 0.5,
     speed: 7,
+    zOrder: 10
   });
+
+  sprites.player.bubble = new SpeechBubble({y: 190});
 
   sprites.dottie = new Character({
     frames: {
@@ -61,24 +64,21 @@ function preloadSprites() {
         loop: false
       },
     },
-    x: 1812,
-    y: 453,
+    x: 452,
+    y: 468,
     scale: 0.5,
     speed: 7,
   });
+
+  sprites.cat.bubble = new SpeechBubble({y: 190});
 
   sprites.dealer = new Character({});
 
   sprites.guard = new Character({});
   
-  sprites.player.bubble = new SpeechBubble({
-    parent: sprites.player,
-    y: 190
-  });
-
-  sprites.cat.bubble = new SpeechBubble({
-    parent: sprites.cat,
-    y: 190
+  sprites.thoughtBubble = new SpeechBubble({
+    isThoughtBubble: true,
+    y: 587
   });
   
 
@@ -89,8 +89,9 @@ function preloadSprites() {
 
   sprites.cat.interactible = new Interactible({
     frames: interactFrames,
-    radius: 100,
-    conversation: "talkCat"
+    y: 150,
+    radius: 200,
+    targetConversation: "talkCat"
   })
 
   sprites.alleyHotspot = new Interactible({
@@ -99,10 +100,20 @@ function preloadSprites() {
     y: 194,
     radius: 100,
     targetScene: "alley",
-    targetX: 2000,
+    targetX: 1500,
     targetFacing: false
   })
   
+  sprites.alleyHotspotInside = new Interactible({
+    frames: interactFrames,
+    x: 1500,
+    y: 239,
+    radius: 100,
+    targetScene: "town",
+    targetX: 182,
+    targetFacing: true
+  })
+
   sprites.barDoorHotspot = new Interactible({
     frames: interactFrames,
     x: 789,
@@ -129,9 +140,20 @@ function preloadSprites() {
     y: 194,
     radius: 100,
     targetScene: "park",
-    targetX: 2000,
+    targetX: 1671,
     targetFacing: false
   })
+  
+  sprites.parkGateHotspotInside = new Interactible({
+    frames: interactFrames,
+    x: 1666,
+    y: 258,
+    radius: 100,
+    targetScene: "town",
+    targetX: 1801,
+    targetFacing: false
+  })
+
   
   sprites.barDoorHotspotInside = new Interactible({
     frames: interactFrames,
@@ -217,7 +239,12 @@ function setupScenes(time) {
     sprites.marketDoorHotspot,
     sprites.parkGateHotspot
   ]);
+  scenes.alley.addSprites([sprites.alleyHotspotInside]);
   scenes.bar.addSprites([sprites.barDoorHotspotInside]);
   scenes.market.addSprites([sprites.marketDoorHotspotInside]);
+  scenes.park.addSprites([sprites.parkGateHotspotInside]);
+  scenes.vip.addSprites([]);
+  scenes.office.addSprites([]);
   
+  scenes.park.addSprites([sprites.cat]);
 }

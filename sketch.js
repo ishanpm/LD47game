@@ -15,9 +15,15 @@ let nextScenePlayerX = 0;
 let nextScenePlayerFlip = false;
 let fadeout = 0;
 
+let permFlags = {};
+let tempFlags = {};
+
 let currentDaytime = 0;
 
+/** @type {InputManager} */
 let input;
+/** @type {ConversationManager} */
+let conversation;
 
 class Scene {
   constructor(config) {
@@ -142,7 +148,12 @@ class Sprite {
     this.curFrame = "default";
     this.curAnimation = null;
     this.animationProgress = 0;
-    this.zOrder = 0;
+    this.zOrder = config.zOrder || 0;
+
+    /** @type{SpeechBubble} */
+    this.bubble = null;
+    /** @type{Interactible} */
+    this.interactible = null;
     
     this.invisible = config.invisible || false;
     this.opacity = 255;
@@ -218,8 +229,17 @@ class Sprite {
   setScene(newScene) {
     if (this.scene) this.scene.removeSprite(this);
     if (newScene) newScene.addSprite(this);
-    
+
     this.scene = newScene;
+    
+    if (this.bubble) {
+      this.bubble.parent = this; // Good a time as any
+      this.bubble.setScene(newScene);
+    }
+    if (this.interactible) {
+      this.interactible.parent = this;
+      this.interactible.setScene(newScene)
+    }
   }
 }
 
@@ -227,25 +247,34 @@ class Interactible extends Sprite {
   constructor(config) {
     super(config);
     
+    this.parent = null; // Set when parent's scene is changed
+    this.radius = config.radius || 100;
+
     this.targetScene = config.targetScene || null;
     this.targetX = config.targetX;
     this.targetFacing = config.targetFacing;
+    this.targetConversation = config.targetConversation || null;
+
     this.inRange = false;
     this.opacity = 0;
     this.revealSpeed = 20;
-    this.radius = config.radius || 100;
+
+    this.zOrder = 101;
   }
   
   tick() {
     super.tick();
+
+    if (this.parent) this.x = this.parent.x;
     
     let player = sprites.player;
     this.inRange = (player.scene === this.scene &&
-                    (abs(player.x - this.x) < this.radius));
+                    (abs(player.x - this.x) < this.radius) &&
+                    !conversation.curConversation);
     
     this.opacity = constrain(this.opacity + (this.inRange ? this.revealSpeed : -this.revealSpeed), 0, 255);
     
-    if (this.inRange && (input.buttons.accept.pressed || input.buttons.up.pressed)) {
+    if (this.inRange && (input.buttons.accept.pressed || input.buttons.up.pressed) && !conversation.curConversation) {
       this.onInteract();
     }
   }
@@ -253,6 +282,8 @@ class Interactible extends Sprite {
   onInteract() {
     if (this.targetScene) {
       switchScene(this.targetScene, this.targetX, this.targetFacing);
+    } else if (this.targetConversation) {
+      conversation.playConversation(this.targetConversation);
     }
   }
 }
@@ -263,14 +294,28 @@ class SpeechBubble extends Sprite {
     
     this.parent = config.parent;
     this.invisible = true;
-    this.text = "foo";
+    this.text = "f0o";
     
     this.y = config.y || 50;
     this.width = 200;
     this.height = 70;
+
+    this.zOrder = 100;
+  }
+
+  say(val) {
+    this.text = val;
+    this.invisible = false;
+  }
+
+  hide() {
+    this.text = "";
+    this.invisible = true;
   }
   
   tick() {
+    if (this.parent) this.x = this.parent.x;
+
     super.tick();
   }
   
@@ -295,7 +340,7 @@ class SpeechBubble extends Sprite {
       pop();
     }
     
-    super.draw();
+    //super.draw();
   }
 }
 
@@ -306,11 +351,6 @@ class Character extends Sprite {
     this.walkFrames = config.walkFrames;
     this.dx = 0;
     this.walking = false;
-
-    /** @type{SpeechBubble} */
-    this.bubble = null;
-    /** @type{Interactible} */
-    this.interactible = null;
   }
   
   tick() {
@@ -325,7 +365,6 @@ class Character extends Sprite {
     
     // Advance walk cycle
     if (this.walking) {
-      
       this.flipx = (this.dx > 0);
     }
     
@@ -345,8 +384,10 @@ class Player extends Character {
   tick() {
     this.dx = 0;
     
-    if (input.buttons.left.held ) this.dx -= this.speed;
-    if (input.buttons.right.held) this.dx += this.speed;
+    if (!conversation.curConversation) {
+      if (input.buttons.left.held ) this.dx -= this.speed;
+      if (input.buttons.right.held) this.dx += this.speed;
+    }
     
     super.tick();
   }
@@ -354,6 +395,7 @@ class Player extends Character {
 
 function preload() {
   input = new InputManager();
+  conversation = new ConversationManager();
   
   preloadSprites();
   preloadScenes();
@@ -373,8 +415,6 @@ function setup() {
 function draw() {
   input.tick();
   
-  conversation.tick();
-  
   background(245);
   
   if (nextScene) {
@@ -393,6 +433,8 @@ function draw() {
     currentScene.tick();
     currentScene.draw();
   }
+  
+  conversation.tick();
   
   // Fade to black
   if (fadeout > 0) {
