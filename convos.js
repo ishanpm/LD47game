@@ -32,6 +32,4 @@ OutroConv1: [
 	{who: "dottie", say:"And there are 20 other eyewitnesses who see me outside this door right now. My alibi is airtight, thanks to you."},
 //Dottie walks off
 	{who: "dottie", say:"Farewell, Dunnet. I hope we meet in better circumstances someday."},
-
-	
 ]
