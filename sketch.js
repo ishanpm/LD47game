@@ -25,16 +25,27 @@ let input;
 /** @type {ConversationManager} */
 let conversation;
 
+/**
+ * Utility function for setting default values
+ * @param {any} value returned if not undefined
+ * @param {any} defaultValue returned if `value` is undefined
+ */
+function ifUndef(value, defaultValue) {
+  return (value === undefined ? defaultValue : value);
+}
+
 class Scene {
   constructor(config) {
-    this.background = config.background || null;
+    this.background = ifUndef(config.background, null);
     this.sprites = [];
     this.toRemove = [];
     this.spritesDirty = true;
     
     this.floor = config.floor // Floor Y position
-    this.backgroundScale = config.scale || 1;
-    this.camxMax = config.camxMax || 0;
+    this.xMin = ifUndef(config.xMin, -Infinity) // Player x min
+    this.xMax = ifUndef(config.xMax, Infinity) // Player x max
+    this.backgroundScale = ifUndef(config.scale, 1);
+    this.camxMax = ifUndef(config.camxMax, 0);
     this.camx = 0;
     this.camy = 0;
     this.focus = null;
@@ -295,6 +306,9 @@ class SpeechBubble extends Sprite {
     this.parent = config.parent;
     this.invisible = true;
     this.text = "f0o";
+
+    this.offsX = ifUndef(config.offsX, 0)
+    this.offsY = ifUndef(config.offsY, -250)
     
     this.y = config.y || 50;
     this.width = 200;
@@ -314,7 +328,10 @@ class SpeechBubble extends Sprite {
   }
   
   tick() {
-    if (this.parent) this.x = this.parent.x;
+    if (this.parent) {
+      this.x = this.parent.x + this.offsX;
+      this.y = this.parent.y + this.offsY;
+    }
 
     super.tick();
   }
@@ -323,7 +340,7 @@ class SpeechBubble extends Sprite {
     if (!this.invisible) {
       push();
       
-      let x = this.parent.x - this.width/2;
+      let x = this.x - this.width/2;
       let y = this.y - this.height;
       
       fill(245);
@@ -388,6 +405,10 @@ class Player extends Character {
       if (input.buttons.left.held ) this.dx -= this.speed;
       if (input.buttons.right.held) this.dx += this.speed;
     }
+
+    if (this.scene) {
+      this.dx = constrain(this.dx, this.scene.xMin - this.x, this.scene.xMax - this.x);
+    }
     
     super.tick();
   }
@@ -406,6 +427,7 @@ function setup() {
   createCanvas(SCREENW,SCREENH);
   pixelDensity(window.devicePixelRatio);
   
+  setupConversations();
   setupScenes(0);
   setScene("town", 100);
   

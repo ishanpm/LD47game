@@ -106,25 +106,3 @@ class ConversationManager {
     // eh
   }
 }
-
-conversation.data = {
-  talkCat: function() {
-    if (!tempFlags.catConv)
-      return "occult1";
-    else if (tempFlags.catConv == "1")
-      return "occult2"
-  },
-  occult1: [
-    {who: "cat", anim: "nervous", next: true},
-    {who: "player", say: "I can... read your mind."},
-    {who: "cat", anim: "jump", say: "WHAT"},
-    {who: "cat", anim: "default", tempFlag:"catConv", val:"1", next: true},
-  ],
-  occult2: [
-    {who: "cat", anim: "nervous", next: true},
-    {who: "cat", say: "But like really?"},
-    {who: "player", say: "Yes."},
-    {who: "cat", anim: "jump", say: "WHAT"},
-    {who: "cat", anim: "default", tempFlag:"catConv", val:"", next: true},
-  ]
-}

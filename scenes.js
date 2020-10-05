@@ -23,7 +23,7 @@ function preloadSprites() {
     zOrder: 10
   });
 
-  sprites.player.bubble = new SpeechBubble({y: 190});
+  sprites.player.bubble = new SpeechBubble({offsY: -261});
 
   sprites.dottie = new Character({
     frames: {
@@ -74,8 +74,16 @@ function preloadSprites() {
 
   sprites.dealer = new Character({});
 
-  sprites.guard = new Character({});
+  sprites.guard = new Character({
+    frames: {
+      default: loadImage("assets/still/Bouncer.png")
+    },
+    x: 111,
+    y: 540
+  });
   
+  sprites.guard.bubble = new SpeechBubble({offsX: 241, offsY: -414});
+
   sprites.thoughtBubble = new SpeechBubble({
     isThoughtBubble: true,
     y: 587
@@ -181,7 +189,7 @@ function preloadScenes() {
     background: loadImage("assets/env/Town.png"),
     scale: 0.5,
     camxMax: 4100/2,
-    floor: 451
+    floor: 451,
   });
 
   scenes.alley = new Scene({
@@ -195,7 +203,9 @@ function preloadScenes() {
     background: loadImage("assets/env/Bar.png"),
     scale: 0.5,
     camxMax: 4200/2,
-    floor: 534
+    floor: 534,
+    xMin: 244,
+    xMax: 2014
   });
   
   scenes.market = new Scene({
@@ -222,7 +232,33 @@ function preloadScenes() {
   });
 }
 
+function setupConversations() {
+  conversation.data = {
+    talkCat: function() {
+      if (!tempFlags.catConv)
+        return "occult1";
+      else if (tempFlags.catConv == "1")
+        return "occult2"
+    },
+    occult1: [
+      {who: "cat", anim: "nervous", next: true},
+      {who: "player", say: "I can... read your mind."},
+      {who: "cat", anim: "jump", say: "WHAT"},
+      {who: "cat", anim: "default", tempFlag:"catConv", val:"1", next: true},
+    ],
+    occult2: [
+      {who: "cat", anim: "nervous", next: true},
+      {who: "cat", say: "But like really?"},
+      {who: "player", say: "Yes."},
+      {who: "cat", anim: "jump", say: "WHAT"},
+      {who: "cat", anim: "default", tempFlag:"catConv", val:"", next: true},
+    ]
+  }
+}
+
 function setupScenes(time) {
+  let playerScene = sprites.player.scene;
+
   // Remove everything
   scenes.town.removeAllSprites();
   scenes.alley.removeAllSprites();
@@ -240,11 +276,17 @@ function setupScenes(time) {
     sprites.parkGateHotspot
   ]);
   scenes.alley.addSprites([sprites.alleyHotspotInside]);
-  scenes.bar.addSprites([sprites.barDoorHotspotInside]);
+  scenes.bar.addSprites([sprites.barDoorHotspotInside, sprites.guard]);
   scenes.market.addSprites([sprites.marketDoorHotspotInside]);
   scenes.park.addSprites([sprites.parkGateHotspotInside]);
   scenes.vip.addSprites([]);
   scenes.office.addSprites([]);
   
-  scenes.park.addSprites([sprites.cat]);
+  switch(time) {
+    case 2:
+      scenes.park.addSprites([sprites.cat]);
+      break;
+  }
+
+  sprites.player.setScene(playerScene);
 }
