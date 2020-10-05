@@ -22,7 +22,7 @@ OutroConv1: [
 	{who: "player", say:"Mr. Lewis? You’re… alive?"},
 	{who: "ace", say:"What is that supposed to mean?"},
 	{who: "player", say:"Never mind. You’re in grave danger, sir -"},
-
+//Dottie shoots Ace
 	{who: "player", say:"Dottie?!"},
 	{who: "dottie", say:"Good evening, Mr. Dunnet. Thank you for taking care of the bouncer for me."},
 	{who: "player", say:"But… why?"},
@@ -30,7 +30,7 @@ OutroConv1: [
 	{who: "dottie", say:"I was trapped in a loop, Dunnet. You should understand."},
 	{who: "player", say:"You can’t be serious. I’m an eyewitness."},
 	{who: "dottie", say:"And there are 20 other eyewitnesses who see me outside this door right now. My alibi is airtight, thanks to you."},
-	
+//Dottie walks off
 	{who: "dottie", say:"Farewell, Dunnet. I hope we meet in better circumstances someday."},
 
 	
