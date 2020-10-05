@@ -16,3 +16,22 @@ bouncerConv2: [
 	{who: "player", say:"The one and only, Brutus. Now let me in, I need to talk to the boss."},
 	{who: "bouncer", say:"Yes, sir!"},
 ]
+
+OutroConv1: [
+	{who: "ace", say:"Who are you? How did you get past the bouncer?"},
+	{who: "player", say:"Mr. Lewis? You’re… alive?"},
+	{who: "ace", say:"What is that supposed to mean?"},
+	{who: "player", say:"Never mind. You’re in grave danger, sir -"},
+
+	{who: "player", say:"Dottie?!"},
+	{who: "dottie", say:"Good evening, Mr. Dunnet. Thank you for taking care of the bouncer for me."},
+	{who: "player", say:"But… why?"},
+	{who: "dottie", say:"You think I like being married to a mob boss? The money was nice at first, but Ace’s temper is something you never want to be on the wrong side of."},
+	{who: "dottie", say:"I was trapped in a loop, Dunnet. You should understand."},
+	{who: "player", say:"You can’t be serious. I’m an eyewitness."},
+	{who: "dottie", say:"And there are 20 other eyewitnesses who see me outside this door right now. My alibi is airtight, thanks to you."},
+	
+	{who: "dottie", say:"Farewell, Dunnet. I hope we meet in better circumstances someday."},
+
+	
+]
