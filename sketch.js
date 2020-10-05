@@ -166,6 +166,7 @@ class Sprite {
     this.frames = config.frames || {};
     this.animations = config.animations || {};
     this.curFrame = "default";
+    this.curVariant = null;
     this.curAnimation = null;
     this.animationProgress = 0;
     this.zOrder = config.zOrder || 0;
@@ -227,7 +228,13 @@ class Sprite {
     if (this.invisible) return;
     
     push();
-    let img = this.frames[this.curFrame];
+
+    let img;
+    if (this.curVariant === null) {
+      img = this.frames[this.curFrame];
+    } else {
+      img = this.frames[`${this.curFrame}_${this.curVariant}`];
+    }
     
     if (this.opacity <= 254) {
       tint(255, this.opacity)
