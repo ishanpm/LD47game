@@ -305,24 +305,36 @@ class SpeechBubble extends Sprite {
     
     this.parent = config.parent;
     this.invisible = true;
-    this.text = "f0o";
+    this.text = "foo";
+    this.choices = null;
+    this.selection = 0;
 
     this.offsX = ifUndef(config.offsX, 0)
     this.offsY = ifUndef(config.offsY, -250)
     
     this.y = config.y || 50;
     this.width = 200;
-    this.height = 70;
+    this.height = 100;
+    this.textSize = 16;
+    this.lineHeight = 18;
 
     this.zOrder = 100;
   }
 
+  showChoice(choices) {
+    this.choices = choices;
+    this.selection = 0;
+    this.invisible = false;
+  }
+
   say(val) {
+    this.choices = null;
     this.text = val;
     this.invisible = false;
   }
 
   hide() {
+    this.choices = null;
     this.text = "";
     this.invisible = true;
   }
@@ -331,6 +343,17 @@ class SpeechBubble extends Sprite {
     if (this.parent) {
       this.x = this.parent.x + this.offsX;
       this.y = this.parent.y + this.offsY;
+    }
+
+    if (!this.invisible && this.choices) {
+      if (input.buttons.down.pressed) {
+        this.selection += 1;
+        if (this.selection >= this.choices.length) this.selection = 0;
+      }
+      if (input.buttons.up.pressed) {
+        this.selection -= 1;
+        if (this.selection < 0) this.selection = this.choices.length - 1;
+      }
     }
 
     super.tick();
@@ -348,11 +371,31 @@ class SpeechBubble extends Sprite {
       strokeWeight(3);
       rect(x, y, this.width, this.height);
       
-      fill(0);
-      noStroke();
-      textAlign(CENTER, CENTER);
-      textSize(20);
-      text(this.text, x, y, this.width, this.height);
+      if (this.choices) {
+        let centerY = this.y - this.height/2;
+        let totalHeight = this.lineHeight * this.choices.length;
+        let firstHeight = centerY - totalHeight/2;
+        
+        // Draw selection box
+        fill(0, 128, 255, 50);
+        noStroke();
+        rect(x, firstHeight + this.lineHeight*this.selection, this.width, this.lineHeight)
+
+        fill(0);
+        textAlign(CENTER, CENTER);
+        textSize(this.textSize);
+        
+        for (let i=0; i<this.choices.length; i++) {
+          let curY = firstHeight + this.lineHeight*i;
+          text(this.choices[i], x, curY, this.width, this.lineHeight);
+        }
+      } else {
+        fill(0);
+        noStroke();
+        textAlign(CENTER, CENTER);
+        textSize(this.textSize);
+        text(this.text, x, y, this.width, this.height);
+      }
       
       pop();
     }

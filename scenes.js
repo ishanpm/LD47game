@@ -241,17 +241,18 @@ function setupConversations() {
         return "occult2"
     },
     occult1: [
-      {who: "cat", anim: "nervous", next: true},
-      {who: "player", say: "I can... read your mind."},
-      {who: "cat", anim: "jump", say: "WHAT"},
-      {who: "cat", anim: "default", tempFlag:"catConv", val:"1", next: true},
+      {who: "cat", anim: "nervous"},
+      {who: "player", tempFlag: "catChoice", choices: ["Hi.","I can... read your mind."]},
+      {ifTemp: "catChoice", eq:"0", who: "cat", say: "..."},
+      {ifTemp: "catChoice", eq:"1", who: "cat", anim: "jump", say: "WHAT"},
+      {ifTemp: "catChoice", eq:"1", who: "cat", anim: "default", tempFlag:"catConv", val:"1"},
     ],
     occult2: [
-      {who: "cat", anim: "nervous", next: true},
+      {who: "cat", anim: "nervous"},
       {who: "cat", say: "But like really?"},
       {who: "player", say: "Yes."},
       {who: "cat", anim: "jump", say: "WHAT"},
-      {who: "cat", anim: "default", tempFlag:"catConv", val:"", next: true},
+      {who: "cat", anim: "default", tempFlag:"catConv", val:""},
     ]
   }
 }

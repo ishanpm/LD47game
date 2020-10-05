@@ -4,6 +4,7 @@ class ConversationManager {
     this.curConversation = null;
     this.convStep = 0;
     this.lastBubble = null;
+    this.lastStep = null;
     this.delay = 0;
   }
   
@@ -25,12 +26,25 @@ class ConversationManager {
   }
   
   advanceConversation() {
+    // Cleanup last step
+    if (this.lastStep) {
+      if (this.lastStep.choices) {
+        let val = "" + this.lastBubble.selection;
+        if (this.lastStep.tempFlag) {
+          tempFlags[this.lastStep.tempFlag] = val;
+        } else if (this.lastStep.permFlag) {
+          permFlags[this.lastStep.permFlag] = val;
+        }
+      }
+    }
+
     // Stop if at end
     if (this.convStep >= this.curConversation.length) {
       if (this.lastBubble) {
         this.lastBubble.hide();
       }
       this.curConversation = null;
+      this.lastStep = null;
       return;
     }
     
@@ -49,12 +63,16 @@ class ConversationManager {
       let character = sprites[step.who];
       let bubble = null;
       let stepText = null;
+      let stepChoices = null;
       let value = step.val ? step.val : null;
       
       // Say things
       if (step.say) {
         bubble = character.bubble;
         stepText = step.say;
+      } else if (step.choices) {
+        bubble = character.bubble;
+        stepChoices = step.choices;
       } else if (step.narrate) {
         bubble = sprites.thoughtBubble;
         stepText = step.narrate;
@@ -67,7 +85,11 @@ class ConversationManager {
       this.lastBubble = bubble;
 
       if (bubble) {
-        bubble.say(stepText);
+        if (stepText) {
+          bubble.say(stepText);
+        } else if (stepChoices) {
+          bubble.showChoice(stepChoices);
+        }
         stepWait = true;
       }
       
@@ -84,6 +106,7 @@ class ConversationManager {
       }
     }
     
+    this.lastStep = step;
     this.convStep++;
     
     if (!stepWait) {
@@ -96,7 +119,8 @@ class ConversationManager {
     if (this.delay > 0) {
       this.delay --;
     } else {
-      if (this.curConversation !== null && (input.buttons.accept.pressed || input.buttons.up.pressed)) {
+      if (this.curConversation !== null &&
+        (input.buttons.accept.pressed || (!this.lastStep.choices && input.buttons.up.pressed))) {
         this.advanceConversation();
       }
     }
