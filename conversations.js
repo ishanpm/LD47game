@@ -17,6 +17,10 @@ class ConversationManager {
     
     if (typeof(this.curConversation) === "function") {
       let computed = this.curConversation();
+      if (!computed) {
+        this.curConversation = null;
+        return;
+      };
       this.curConversation = this.data[computed];
     }
 
@@ -54,9 +58,9 @@ class ConversationManager {
 
     // Determine if step is active
     if (step.ifTemp) {
-      stepActive = stepActive && tempFlags[step.ifTemp] === step.eq
+      stepActive = stepActive && tempFlags[step.ifTemp] == step.eq
     } else if (step.ifPerm) {
-      stepActive = stepActive && tempFlags[step.ifPerm] === step.eq
+      stepActive = stepActive && tempFlags[step.ifPerm] == step.eq
     }
 
     if (stepActive) {
@@ -74,7 +78,7 @@ class ConversationManager {
         bubble = character.bubble;
         stepChoices = step.choices;
       } else if (step.narrate) {
-        bubble = sprites.thoughtBubble;
+        bubble = sprites.player.thoughtBubble;
         stepText = step.narrate;
       }
 
@@ -102,7 +106,7 @@ class ConversationManager {
       if (step.tempFlag) {
         tempFlags[step.tempFlag] = step.val;
       } else if (step.permFlag) {
-        permFlags[step.tempFlag] = step.val;
+        permFlags[step.permFlag] = step.val;
       }
 
       // Special: Set daytime
@@ -114,6 +118,11 @@ class ConversationManager {
     this.lastStep = step;
     this.convStep++;
     
+    if (step.transfer) {
+      this.convStep = 0;
+      this.curConversation = this.data[step.transfer];
+    }
+
     if (!stepWait) {
       // Do another step
       this.advanceConversation();
@@ -125,7 +134,7 @@ class ConversationManager {
       this.delay --;
     } else {
       if (this.curConversation !== null &&
-        (input.buttons.accept.pressed || (!this.lastStep.choices && input.buttons.up.pressed))) {
+        (input.buttons.accept.pressed || (!(this.lastStep && this.lastStep.choices) && input.buttons.up.pressed))) {
         this.advanceConversation();
       }
     }

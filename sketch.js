@@ -173,6 +173,8 @@ class Sprite {
 
     /** @type{SpeechBubble} */
     this.bubble = null;
+    /** @type{SpeechBubble} */
+    this.thoughtBubble = null;
     /** @type{Interactible} */
     this.interactible = null;
     
@@ -265,6 +267,10 @@ class Sprite {
       this.bubble.parent = this; // Good a time as any
       this.bubble.setScene(newScene);
     }
+    if (this.thoughtBubble) {
+      this.thoughtBubble.parent = this; // Good a time as any
+      this.thoughtBubble.setScene(newScene);
+    }
     if (this.interactible) {
       this.interactible.parent = this;
       this.interactible.setScene(newScene)
@@ -331,21 +337,27 @@ class SpeechBubble extends Sprite {
     this.offsY = ifUndef(config.offsY, -250)
     
     this.y = config.y || 50;
-    this.width = 200;
+    this.width = 250;
     this.height = 100;
+    this.padding = 10;
     this.textSize = 16;
     this.lineHeight = 18;
+    this.isThoughtBubble = ifUndef(config.isThoughtBubble, false);
+    this.textOpacity = 0;
+    this.textSpeed = 20;
 
     this.zOrder = 101;
   }
 
   showChoice(choices) {
+    this.textOpacity = 255;
     this.choices = choices;
     this.selection = 0;
     this.invisible = false;
   }
 
   say(val) {
+    this.textOpacity = 0;
     this.choices = null;
     this.text = val;
     this.invisible = false;
@@ -359,8 +371,12 @@ class SpeechBubble extends Sprite {
   
   tick() {
     if (this.parent) {
-      this.x = this.parent.x + this.offsX;
-      this.y = this.parent.y + this.offsY;
+      if (this.isThoughtBubble) {
+        this.x = this.scene.camx + SCREENW/2;
+      } else {
+        this.x = this.parent.x + this.offsX;
+        this.y = this.parent.y + this.offsY;
+      }
     }
 
     if (!this.invisible && this.choices) {
@@ -374,6 +390,8 @@ class SpeechBubble extends Sprite {
       }
     }
 
+    this.textOpacity = constrain(this.textOpacity + this.textSpeed, 0, 255)
+
     super.tick();
   }
   
@@ -384,8 +402,13 @@ class SpeechBubble extends Sprite {
       let x = this.x - this.width/2;
       let y = this.y - this.height;
       
-      fill(245);
-      stroke(0);
+      if (this.isThoughtBubble) {
+        fill(0);
+        stroke(255);
+      } else {
+        fill(245);
+        stroke(0);
+      }
       strokeWeight(3);
       rect(x, y, this.width, this.height);
       
@@ -399,7 +422,11 @@ class SpeechBubble extends Sprite {
         noStroke();
         rect(x, firstHeight + this.lineHeight*this.selection, this.width, this.lineHeight)
 
-        fill(0);
+        if (this.isThoughtBubble) {
+          fill(255, this.textOpacity);
+        } else {
+          fill(0, this.textOpacity);
+        }
         textAlign(CENTER, CENTER);
         textSize(this.textSize);
         
@@ -408,11 +435,15 @@ class SpeechBubble extends Sprite {
           text(this.choices[i], x, curY, this.width, this.lineHeight);
         }
       } else {
-        fill(0);
+        if (this.isThoughtBubble) {
+          fill(255, this.textOpacity);
+        } else {
+          fill(0, this.textOpacity);
+        }
         noStroke();
         textAlign(CENTER, CENTER);
         textSize(this.textSize);
-        text(this.text, x, y, this.width, this.height);
+        text(this.text, x + this.padding, y, this.width - this.padding*2, this.height);
       }
       
       pop();
@@ -573,6 +604,11 @@ function setScene(target, playerX, playerFacing) {
     prevScene.onHide();
   }
   currentScene.onShow();
+
+  // Special conversations when entering town
+  if (target === "town") {
+    conversation.playConversation("enterTown");
+  }
 }
 
 function mouseClicked() {

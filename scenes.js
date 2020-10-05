@@ -43,6 +43,11 @@ function preloadSprites() {
 
   sprites.player.bubble = new SpeechBubble({offsY: -261});
 
+  sprites.player.thoughtBubble = new SpeechBubble({
+    isThoughtBubble: true,
+    y: 587
+  });
+
   sprites.dottie = new Character({
     frames: {
       "default": loadImage("assets/anim/Dottie Shoot_0008.png"),
@@ -72,13 +77,15 @@ function preloadSprites() {
       },
       "shoot": {
         ids: ["shoot0", "shoot1", "shoot2", "shoot3", "shoot4", "shoot5", "shoot6", "shoot7", "shoot8"],
-        period: 3000,
+        period: 100,
         loop: false
       }
     },
     scale: 0.5,
     speed: 7,
   });
+
+  sprites.dottie.bubble = new SpeechBubble({offsY: -267});
   
   sprites.cat = new Character({
     frames: {
@@ -104,22 +111,38 @@ function preloadSprites() {
 
   sprites.cat.bubble = new SpeechBubble({y: 190});
 
-  sprites.dealer = new Character({});
+  sprites.dealer = new Character({
+    frames: {
+      "default": loadImage("assets/still/Drug_Dealer.png")
+    },
+    scale: 0.5,
+    x: 706,
+    y: 532
+  });
+
+  sprites.dealer.bubble = new SpeechBubble({offsY: -414});
 
   sprites.guard = new Character({
     frames: {
       default: loadImage("assets/still/Bouncer.png")
     },
+    scale: 0.5,
     x: 111,
     y: 540
   });
   
   sprites.guard.bubble = new SpeechBubble({offsX: 241, offsY: -414});
 
-  sprites.thoughtBubble = new SpeechBubble({
-    isThoughtBubble: true,
-    y: 587
-  });
+  sprites.cashier = new Character({
+    frames: {
+      "default": loadImage("assets/still/Dane_Sprite.png")
+    },
+    scale: 0.4,
+    x: 260,
+    y: 323
+  })
+
+  sprites.cashier.bubble = new SpeechBubble({offsY: -414});
 
   // ENVIRONMENT
 
@@ -136,12 +159,32 @@ function preloadSprites() {
   
   let interactFrames = {"default": loadImage("assets/prompt.png")};
   
+  sprites.dealer.interactible = new Interactible({
+    frames: interactFrames,
+    radius: 200,
+    y: 128,
+    targetConversation: "talkDealer"
+  })
+  
+  sprites.guard.interactible = new Interactible({
+    frames: interactFrames,
+    radius: 200,
+    y: 108,
+    targetConversation: "talkGuard"
+  })
 
   sprites.cat.interactible = new Interactible({
     frames: interactFrames,
-    y: 150,
     radius: 200,
+    y: 268,
     targetConversation: "talkCat"
+  })
+
+  sprites.cashier.interactible = new Interactible({
+    frames: interactFrames,
+    radius: 200,
+    y: 100,
+    targetConversation: "talkCashier"
   })
 
   sprites.clockTowerHotspot = new Interactible({
@@ -302,6 +345,31 @@ function preloadScenes() {
 
 function setupConversations() {
   conversation.data = {
+    intro: [
+      {narrate: "The dame walked into my office."},
+      {narrate: "Not a Dane, mind you.\nThat would be a dog.\nShe was a sheep."},
+      {who:"dottie", say:"You're... detective Dunnet?"},
+      {who:"player", say:"The one and only, ma'am."},
+      {who:"dottie", say:"My name is Dottie.\nYou must help me!\nMy husband... has just been..."},
+      {who:"dottie", say:"Murdered!"},
+      {narrate: "Murder, of course. I wouldn't have it any other way."},
+      {narrate: "...Not that I want people to be murdered, obviously, just...\nYou know what I mean."},
+      {who:"player", say:"Have you told the police?"},
+      {who:"dottie", say:"They won't help me. My husband was not... in their favor."},
+      {who:"dottie", say:"A friend told me you could solve any case, that you had some sort of trick."},
+      {narrate: "She was right, of course.\nIt was an artifact that let me go back in time."},
+      {narrate: "No case is impossible when you can witness the crime firsthand."},
+      {who:"dottie", say:"Here’s a photo of him.\nMr. Lewis, you’ll recognize him immediately."},
+      {who:"player", say:"Where was he last seen?"},
+      {who:"dottie", say:"At the bar, The Watering Hole."},
+      {who:"dottie", say:"Will you find out who did this?"},
+      {who:"player", say:"Certainly. I'll prepare my investigation immediately."},
+      {who:"dottie", say:"Thank you..."},
+      {narrate: "As powerful as the artifact was, it couldn't erase a murder. That would only cause a paradox."},
+      {narrate: "It would be enough to catch the perpetrator, and give some closure to the little lamb."},
+      {narrate: "There’s no time like the present, especially when your future is in the past."},
+      {narrate: "I’ll loop back to noon this morning and see what I can find."},
+    ],
     changeTime: function() {
       switch (currentDaytime) {
         case 0: return "changeTime0";
@@ -324,25 +392,91 @@ function setupConversations() {
       {who: "player", tempFlag: "timechoice", choices: ["Nevermind","Reset the loop"]},
       {ifTemp: "timechoice", eq: "1", setTime: 0}
     ],
-    talkCat: function() {
-      if (!tempFlags.catConv)
-        return "occult1";
-      else if (tempFlags.catConv == "1")
-        return "occult2"
+    enterTown: function() {
+      if (permFlags["bossName"] === "1") {
+        return "museBossName"
+      } 
+      return null;
     },
-    occult1: [
-      {who: "cat", anim: "nervous"},
-      {who: "player", tempFlag: "catChoice", choices: ["Hi.","I can... read your mind."]},
-      {ifTemp: "catChoice", eq:"0", who: "cat", say: "..."},
-      {ifTemp: "catChoice", eq:"1", who: "cat", anim: "jump", say: "WHAT"},
-      {ifTemp: "catChoice", eq:"1", who: "cat", anim: "default", tempFlag:"catConv", val:"1"},
+    museBossName: [
+      {who: "player", say: "This rival gang leader must be the killer. I’ve got to get in there and see the evidence for myself."},
+      {permFlag: "bossNme", val: "2"}
     ],
-    occult2: [
-      {who: "cat", anim: "nervous"},
-      {who: "cat", say: "But like really?"},
-      {who: "player", say: "Yes."},
-      {who: "cat", anim: "jump", say: "WHAT"},
-      {who: "cat", anim: "default", tempFlag:"catConv", val:""},
+    talkDealer: function() {
+      if (tempFlags.dealerConv) {
+        return "talkDealer2";
+      } else {
+        if (currentDaytime === 0) {
+          return "talkDealer0";
+        } else {
+          return "talkDealer1";
+        }
+      }
+    },
+    talkDealer0: [
+      {who: "dealer", say:"Hey there. You got here right on time."},
+      {who: "dealer", say:"I’m trying out a new business strategy; selling during the day. The cops won’t suspect a thing!"},
+      {who: "player", say:"Son, I’m a cop."},
+      {who: "dealer", say:"...Oh. Dang."},
+      {who: "player", say:"Luckily, I’m not here for you. Answer a few questions and I’ll be on my way."},
+      {who: "player", say:"Can you tell me anything about the bouncer who works at the Watering Hole?"},
+      {who: "dealer", say:"Yeah, his name’s Brutus. I know, right? But he’s not so tough."},
+      {who: "dealer", say:"He’s terrified of his boss, Mr. Smith. Now that guy’s scary. Looks kinda like you, actually."},
+      {who: "player", say:"Well, that was easy - "},
+      {who: "dealer", say:"And Brutus is on high duty today."},
+      {who: "dealer", say:"Apparently Ace Lewis - the big boss - has some kinda high profile meeting today with a rival gang leader."},
+      {who: "dealer", say:"It's supposed to be intense."},
+      {who: "player", say:"...Anything else?"},
+      {who: "dealer", say:"... No, that’s it."},
+      {who: "dealer", say:"Am I arrested?"},
+      {who: "player", say:"No, not today. But don’t let me see you again, ok?"},
+      {who: "dealer", say:"Sweet!"},
+      {tempFlag: "dealerConv", val: "1"},
+      {permFlag: "bossName", val: "1"},
+    ],
+    talkDealer1: [
+      {who: "dealer", say:"Sorry, bud, I don’t have anything on me. You should have been here this morning."}
+    ],
+    talkDealer2: [
+      {who: "dealer", say:"Hey, thanks for not arresting me!"}
+    ],
+    talkCat: function() {
+      if (tempFlags.catBan)
+        return "catBan"
+      if (sprites.player.curVariant === "robe")
+        return "catTalk";
+       
+      return "catDeny"
+    },
+    catDeny: [
+      {who:"cat", anim:"nervous", say:"Hey! Only official members are allowed into the circle! Come back with your uniform, mister!"}
+      {who:"cat", anim:"default"}
+    ],
+    catBan: [
+      {who:"cat", anim:"nervous", say:"Go away, you're banned!"}
+      {who:"cat", anim:"default"}
+    ],
+    catTalk: [
+      {who: "cat", say:"Sweet! Another member!"},
+      {who: "player", say: "Hello… small child. What are you up to?"},
+      {who: "cat", say:"Contacting the dead! There’s loads of spirits all around here. Can you hear them?"},
+      {who: "player", say: " I do have excellent ears."},
+      {who: "cat", anim:"jump", say:"WHAT? Really? Ask them what I’m thinking of so I know you’re not faking!"},
+      {who: "player", ifPerm: "catCloak", eq: "", tempFlag: "choice", choice: ["I'm not sure"]},
+      {who: "player", ifPerm: "catCloak", eq: "1", tempFlag: "choice", choice: ["I'm not sure", "Your awesome cloak"]},
+      {ifTemp:"choice", eq:"0", transfer:"catUnimpressed"},
+      {ifTemp:"choice", eq:"1", transfer:"catImpressed"}
+    ],
+    catUnimpressed: [
+      {who: "cat", anim: "jump", say:"WHAT? A real medium would know it was my awesome cloak! Get out, you’re banned from the club!"},
+      {who: "cat", anim: "default"},
+      {tempFlag: "catBan", val: "1"},
+      {permFlag: "catCloak", val: "1"}
+    ],
+    catImpressed: [
+      {who: "cat", anim: "jump", say:"WHAT? You’re for real? That’s so cool! You’re way better than the last guy I asked to join the club."},
+      {who: "cat", anim: "jump", say:"He was this really grumpy rabbit, kinda like you. But he had a different vest on."},
+      
     ]
   }
 }
@@ -368,14 +502,19 @@ function setupScenes(time) {
     sprites.marketDoorHotspot,
     sprites.parkGateHotspot
   ]);
-  scenes.alley.addSprites([sprites.alleyHotspotInside]);
+  scenes.alley.addSprites([sprites.alleyHotspotInside, sprites.dealer]);
   scenes.bar.addSprites([sprites.barDoorHotspotInside, sprites.guard]);
-  scenes.market.addSprites([sprites.marketDoorHotspotInside]);
+  scenes.market.addSprites([sprites.marketDoorHotspotInside, sprites.cashier]);
   scenes.park.addSprites([sprites.parkGateHotspotInside]);
   scenes.vip.addSprites([]);
   scenes.office.addSprites([]);
   
   switch(time) {
+    case 0:
+      //scenes.town.addSprites([sprites.dottie]);
+      //sprites.dottie.x = 200;
+      //sprites.dottie.y = scenes.town.floor;
+      break;
     case 2:
       scenes.park.addSprites([sprites.cat]);
       break;
