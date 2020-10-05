@@ -66,21 +66,33 @@ function preloadSprites() {
     scale: 0.5,
     speed: 7,
   });
+
+  sprites.dealer = new Character({});
+
+  sprites.guard = new Character({});
   
-  sprites.playerBubble = new SpeechBubble({
+  sprites.player.bubble = new SpeechBubble({
     parent: sprites.player,
     y: 190
   });
-  
-  sprites.catBubble = new SpeechBubble({
+
+  sprites.cat.bubble = new SpeechBubble({
     parent: sprites.cat,
     y: 190
   });
   
+
   // INTERACTIBLES
   
   let interactFrames = {"default": loadImage("assets/prompt.png")};
   
+
+  sprites.cat.interactible = new Interactible({
+    frames: interactFrames,
+    radius: 100,
+    conversation: "talkCat"
+  })
+
   sprites.alleyHotspot = new Interactible({
     frames: interactFrames,
     x: 182,

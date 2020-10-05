@@ -306,6 +306,11 @@ class Character extends Sprite {
     this.walkFrames = config.walkFrames;
     this.dx = 0;
     this.walking = false;
+
+    /** @type{SpeechBubble} */
+    this.bubble = null;
+    /** @type{Interactible} */
+    this.interactible = null;
   }
   
   tick() {
