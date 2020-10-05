@@ -9,7 +9,25 @@ function preloadSprites() {
       "walk4":   loadImage("assets/anim/Dunnet Walk Cycle_0004.png"),
       "walk5":   loadImage("assets/anim/Dunnet Walk Cycle_0005.png"),
       "walk6":   loadImage("assets/anim/Dunnet Walk Cycle_0006.png"),
-      "walk7":   loadImage("assets/anim/Dunnet Walk Cycle_0007.png")
+      "walk7":   loadImage("assets/anim/Dunnet Walk Cycle_0007.png"),
+      "default_vest": loadImage("assets/still/Dunnet_Vest_Standing.png"),
+      "walk0_vest":   loadImage("assets/anim/Dunnet_Walk_Vest_0000.png"),
+      "walk1_vest":   loadImage("assets/anim/Dunnet_Walk_Vest_0001.png"),
+      "walk2_vest":   loadImage("assets/anim/Dunnet_Walk_Vest_0002.png"),
+      "walk3_vest":   loadImage("assets/anim/Dunnet_Walk_Vest_0003.png"),
+      "walk4_vest":   loadImage("assets/anim/Dunnet_Walk_Vest_0004.png"),
+      "walk5_vest":   loadImage("assets/anim/Dunnet_Walk_Vest_0005.png"),
+      "walk6_vest":   loadImage("assets/anim/Dunnet_Walk_Vest_0006.png"),
+      "walk7_vest":   loadImage("assets/anim/Dunnet_Walk_Vest_0007.png"),
+      "default_robe": loadImage("assets/still/Dunnet_Robe_Standing.png"),
+      "walk0_robe":   loadImage("assets/anim/Dunnet_Walk_Robe_0000.png"),
+      "walk1_robe":   loadImage("assets/anim/Dunnet_Walk_Robe_0001.png"),
+      "walk2_robe":   loadImage("assets/anim/Dunnet_Walk_Robe_0002.png"),
+      "walk3_robe":   loadImage("assets/anim/Dunnet_Walk_Robe_0003.png"),
+      "walk4_robe":   loadImage("assets/anim/Dunnet_Walk_Robe_0004.png"),
+      "walk5_robe":   loadImage("assets/anim/Dunnet_Walk_Robe_0005.png"),
+      "walk6_robe":   loadImage("assets/anim/Dunnet_Walk_Robe_0006.png"),
+      "walk7_robe":   loadImage("assets/anim/Dunnet_Walk_Robe_0007.png")
     },
     animations: {
       "walk": {
@@ -27,7 +45,7 @@ function preloadSprites() {
 
   sprites.dottie = new Character({
     frames: {
-      "default": loadImage("assets/anim/Dottie_Walk_0002.png"),
+      "default": loadImage("assets/anim/Dottie Shoot_0008.png"),
       "walk0":   loadImage("assets/anim/Dottie_Walk_0000.png"),
       "walk1":   loadImage("assets/anim/Dottie_Walk_0001.png"),
       "walk2":   loadImage("assets/anim/Dottie_Walk_0002.png"),
@@ -35,13 +53,27 @@ function preloadSprites() {
       "walk4":   loadImage("assets/anim/Dottie_Walk_0004.png"),
       "walk5":   loadImage("assets/anim/Dottie_Walk_0005.png"),
       "walk6":   loadImage("assets/anim/Dottie_Walk_0006.png"),
-      "walk7":   loadImage("assets/anim/Dottie_Walk_0007.png")
+      "walk7":   loadImage("assets/anim/Dottie_Walk_0007.png"),
+      "shoot0":  loadImage("assets/anim/Dottie Shoot_0000.png"),
+      "shoot1":  loadImage("assets/anim/Dottie Shoot_0001.png"),
+      "shoot2":  loadImage("assets/anim/Dottie Shoot_0002.png"),
+      "shoot3":  loadImage("assets/anim/Dottie Shoot_0003.png"),
+      "shoot4":  loadImage("assets/anim/Dottie Shoot_0004.png"),
+      "shoot5":  loadImage("assets/anim/Dottie Shoot_0005.png"),
+      "shoot6":  loadImage("assets/anim/Dottie Shoot_0006.png"),
+      "shoot7":  loadImage("assets/anim/Dottie Shoot_0007.png"),
+      "shoot8":  loadImage("assets/anim/Dottie Shoot_0008.png"),
     },
     animations: {
       "walk": {
         ids: ["walk0", "walk1", "walk2", "walk3", "walk4", "walk5", "walk6", "walk7"],
         period: 50,
         loop: true
+      },
+      "shoot": {
+        ids: ["shoot0", "shoot1", "shoot2", "shoot3", "shoot4", "shoot5", "shoot6", "shoot7", "shoot8"],
+        period: 3000,
+        loop: false
       }
     },
     scale: 0.5,
@@ -88,7 +120,17 @@ function preloadSprites() {
     isThoughtBubble: true,
     y: 587
   });
-  
+
+  // ENVIRONMENT
+
+  sprites.clockTower = new Sprite({
+    frames: {
+      default: loadImage("assets/env/Clock Tower.png")
+    },
+    hAlign: 0,
+    vAlign: 0,
+    zOrder: -100
+  })
 
   // INTERACTIBLES
   
@@ -100,6 +142,14 @@ function preloadSprites() {
     y: 150,
     radius: 200,
     targetConversation: "talkCat"
+  })
+
+  sprites.clockTowerHotspot = new Interactible({
+    frames: interactFrames,
+    x: 1017,
+    y: 205,
+    radius: 70,
+    targetConversation: "changeTime"
   })
 
   sprites.alleyHotspot = new Interactible({
@@ -186,17 +236,25 @@ function preloadSprites() {
 
 function preloadScenes() {
   scenes.town = new Scene({
-    background: loadImage("assets/env/Town.png"),
+    backgrounds: [
+      loadImage("assets/env/Town_4.png"),
+      loadImage("assets/env/Town_8.png"),
+      loadImage("assets/env/Town_Midnight.png")
+    ],
     scale: 0.5,
     camxMax: 4100/2,
     floor: 451,
+    xMin: 54,
+    xMax: 2000,
   });
 
   scenes.alley = new Scene({
     background: loadImage("assets/env/Alley.png"),
     scale: 0.5,
     camxMax: 3173/2,
-    floor: 534
+    floor: 534,
+    xMin: 93,
+    xMax: 1500,
   });
   
   scenes.bar = new Scene({
@@ -212,14 +270,22 @@ function preloadScenes() {
     background: loadImage("assets/env/Market.png"),
     scale: 0.5,
     camxMax: 3168/2,
-    floor: 534
+    floor: 534,
+    xMin: 54,
+    xMax: 1528,
   });
 
   scenes.park = new Scene({
-    background: loadImage("assets/env/Park.png"),
+    backgrounds: [
+      loadImage("assets/env/Park_4.png"),
+      loadImage("assets/env/Park_8.png"),
+      loadImage("assets/env/Park_Midnight.png")
+    ],
     scale: 0.5,
     camxMax: 3480/2,
-    floor: 534
+    floor: 534,
+    xMin: 54,
+    xMax: 1671,
   });
 
   scenes.vip = new Scene({});
@@ -228,12 +294,36 @@ function preloadScenes() {
     background: loadImage("assets/env/Office.png"),
     scale: 0.5,
     camxMax: 1920/2,
-    floor: 534
+    floor: 534,
+    xMin: 54,
+    xMax: 910,
   });
 }
 
 function setupConversations() {
   conversation.data = {
+    changeTime: function() {
+      switch (currentDaytime) {
+        case 0: return "changeTime0";
+        case 1: return "changeTime1";
+        case 2: return "changeTime2";
+      }
+    },
+    changeTime0: [
+      {who: "player", tempFlag: "timechoice", choices: ["Nevermind","Wait until 8pm","Wait until midnight","Reset the loop"]},
+      {ifTemp: "timechoice", eq: "1", setTime: 1},
+      {ifTemp: "timechoice", eq: "2", setTime: 2},
+      {ifTemp: "timechoice", eq: "3", setTime: 0},
+    ],
+    changeTime1: [
+      {who: "player", tempFlag: "timechoice", choices: ["Nevermind","Wait until midnight","Reset the loop"]},
+      {ifTemp: "timechoice", eq: "1", setTime: 2},
+      {ifTemp: "timechoice", eq: "2", setTime: 0},
+    ],
+    changeTime2: [
+      {who: "player", tempFlag: "timechoice", choices: ["Nevermind","Reset the loop"]},
+      {ifTemp: "timechoice", eq: "1", setTime: 0}
+    ],
     talkCat: function() {
       if (!tempFlags.catConv)
         return "occult1";
@@ -271,6 +361,8 @@ function setupScenes(time) {
 
   // Add common sprites
   scenes.town.addSprites([
+    sprites.clockTower,
+    sprites.clockTowerHotspot,
     sprites.alleyHotspot,
     sprites.barDoorHotspot,
     sprites.marketDoorHotspot,
@@ -289,5 +381,8 @@ function setupScenes(time) {
       break;
   }
 
-  sprites.player.setScene(playerScene);
+  if (playerScene != null) {
+    sprites.player.setScene(playerScene);
+    playerScene.updateBackground();
+  }
 }
