@@ -449,11 +449,11 @@ function setupConversations() {
       return "catDeny"
     },
     catDeny: [
-      {who:"cat", anim:"nervous", say:"Hey! Only official members are allowed into the circle! Come back with your uniform, mister!"}
+      {who:"cat", anim:"nervous", say:"Hey! Only official members are allowed into the circle! Come back with your uniform, mister!"},
       {who:"cat", anim:"default"}
     ],
     catBan: [
-      {who:"cat", anim:"nervous", say:"Go away, you're banned!"}
+      {who:"cat", anim:"nervous", say:"Go away, you're banned!"},
       {who:"cat", anim:"default"}
     ],
     catTalk: [
@@ -475,8 +475,12 @@ function setupConversations() {
     ],
     catImpressed: [
       {who: "cat", anim: "jump", say:"WHAT? You’re for real? That’s so cool! You’re way better than the last guy I asked to join the club."},
-      {who: "cat", anim: "jump", say:"He was this really grumpy rabbit, kinda like you. But he had a different vest on."},
-      
+      {who: "player", say:"And who was this?"},
+      {who: "cat", anim: "happy", say:"He was this really grumpy rabbit, kinda like you. But he had a different vest on."},
+      {who: "cat", anim: "happy", say:"It wasn’t the official uniform, but I gave him a try anyway."},
+      {who: "cat", say:"But he sucked! Now only uniform-wearing members are allowed in the club."},
+      {who: "cat", anim: "default"},
+      {permFlag: "bossVest", val: "1"}
     ]
   }
 }
