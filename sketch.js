@@ -7,6 +7,13 @@ let scenes = {};
 let sprites = {};
 /** @type {Scene} */
 let currentScene;
+let currentDaytime = 0;
+
+let permFlags = {};
+let tempFlags = {};
+
+let inTransition = false;
+let nextDaytime = null;
 /** @type {?Scene} */
 let nextScene = null;
 /** @type {number} */
@@ -14,11 +21,6 @@ let nextScenePlayerX = 0;
 /** @type {boolean} */
 let nextScenePlayerFlip = false;
 let fadeout = 0;
-
-let permFlags = {};
-let tempFlags = {};
-
-let currentDaytime = 0;
 
 /** @type {InputManager} */
 let input;
@@ -37,6 +39,7 @@ function ifUndef(value, defaultValue) {
 class Scene {
   constructor(config) {
     this.background = ifUndef(config.background, null);
+    this.backgrounds = ifUndef(config.backgrounds, null);
     this.sprites = [];
     this.toRemove = [];
     this.spritesDirty = true;
@@ -50,6 +53,12 @@ class Scene {
     this.camy = 0;
     this.focus = null;
     this.camSpeed = 0.1;
+  }
+
+  updateBackground() {
+    if (this.backgrounds) {
+      this.background = this.backgrounds[currentDaytime];
+    }
   }
   
   worldToLocal([x, y]) {
@@ -173,6 +182,8 @@ class Sprite {
     
     this.x = config.x || 0;
     this.y = config.y || 0;
+    this.hAlign = ifUndef(config.hAlign, 0.5);
+    this.vAlign = ifUndef(config.vAlign, 1);
   }
   
   startAnimation(id) {
@@ -228,7 +239,7 @@ class Sprite {
       if (this.flipx) {
         scale(-1,1);
       }
-      image(img, -img.width/2, -img.height);
+      image(img, -img.width * this.hAlign, -img.height * this.vAlign);
     } else {
       noFill();
       stroke(255,0,0);
@@ -270,7 +281,7 @@ class Interactible extends Sprite {
     this.opacity = 0;
     this.revealSpeed = 20;
 
-    this.zOrder = 101;
+    this.zOrder = 100;
   }
   
   tick() {
@@ -281,7 +292,7 @@ class Interactible extends Sprite {
     let player = sprites.player;
     this.inRange = (player.scene === this.scene &&
                     (abs(player.x - this.x) < this.radius) &&
-                    !conversation.curConversation);
+                    !(inTransition || conversation.curConversation));
     
     this.opacity = constrain(this.opacity + (this.inRange ? this.revealSpeed : -this.revealSpeed), 0, 255);
     
@@ -318,7 +329,7 @@ class SpeechBubble extends Sprite {
     this.textSize = 16;
     this.lineHeight = 18;
 
-    this.zOrder = 100;
+    this.zOrder = 101;
   }
 
   showChoice(choices) {
@@ -377,7 +388,7 @@ class SpeechBubble extends Sprite {
         let firstHeight = centerY - totalHeight/2;
         
         // Draw selection box
-        fill(0, 128, 255, 50);
+        fill(0, 128, 255, 100);
         noStroke();
         rect(x, firstHeight + this.lineHeight*this.selection, this.width, this.lineHeight)
 
@@ -444,7 +455,7 @@ class Player extends Character {
   tick() {
     this.dx = 0;
     
-    if (!conversation.curConversation) {
+    if (!(inTransition || conversation.curConversation)) {
       if (input.buttons.left.held ) this.dx -= this.speed;
       if (input.buttons.right.held) this.dx += this.speed;
     }
@@ -482,12 +493,19 @@ function draw() {
   
   background(245);
   
-  if (nextScene) {
+  if (inTransition) {
     fadeout = constrain(fadeout+10, 0, 255);
     
     if (fadeout === 255) {
-      setScene(nextScene, nextScenePlayerX, nextScenePlayerFacing);
+      if (nextDaytime !== null) {
+        setDaytime(nextDaytime);
+      }
+      if (nextScene !== null) {
+        setScene(nextScene, nextScenePlayerX, nextScenePlayerFacing);
+      }
+      nextDaytime = null;
       nextScene = null;
+      inTransition = false;
     }
   } else {
     fadeout = constrain(fadeout-10, 0, 255);
@@ -508,11 +526,26 @@ function draw() {
 }
 
 function switchScene(target, playerX, playerFacing) {
-  if (!nextScene) {
-    nextScene = target;
-    nextScenePlayerX = playerX;
-    nextScenePlayerFacing = playerFacing;
+  inTransition = true;
+  nextScene = target;
+  nextScenePlayerX = playerX;
+  nextScenePlayerFacing = playerFacing;
+}
+
+function switchDayime(nextTime) {
+  inTransition = true;
+  nextDaytime = nextTime;
+}
+
+function setDaytime(nextTime) {
+  if (nextTime === 0) {
+    // Reset the clock
+    tempFlags = {};
+  } else {
+    // don't do that i guess
   }
+  currentDaytime = nextTime;
+  setupScenes(currentDaytime);
 }
 
 function setScene(target, playerX, playerFacing) {
@@ -526,6 +559,8 @@ function setScene(target, playerX, playerFacing) {
   player.x = playerX;
   player.flipx = playerFacing;
   player.y = currentScene.floor;
+
+  currentScene.updateBackground();
   
   if (prevScene) {
     prevScene.onHide();

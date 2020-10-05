@@ -104,6 +104,11 @@ class ConversationManager {
       } else if (step.permFlag) {
         permFlags[step.tempFlag] = step.val;
       }
+
+      // Special: Set daytime
+      if (step.setTime !== undefined) {
+        switchDayime(step.setTime);
+      }
     }
     
     this.lastStep = step;
