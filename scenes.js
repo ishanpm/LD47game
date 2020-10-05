@@ -50,7 +50,7 @@ function preloadSprites() {
 
   sprites.dottie = new Character({
     frames: {
-      "default": loadImage("assets/anim/Dottie Shoot_0008.png"),
+      "default": loadImage("assets/still/Dottie_Standing.png"),
       "walk0":   loadImage("assets/anim/Dottie_Walk_0000.png"),
       "walk1":   loadImage("assets/anim/Dottie_Walk_0001.png"),
       "walk2":   loadImage("assets/anim/Dottie_Walk_0002.png"),
@@ -103,10 +103,11 @@ function preloadSprites() {
         loop: false
       },
     },
-    x: 452,
-    y: 468,
+    x: 713,
+    y: 462,
     scale: 0.5,
     speed: 7,
+    flipX: true
   });
 
   sprites.cat.bubble = new SpeechBubble({y: 190});
@@ -142,7 +143,7 @@ function preloadSprites() {
     y: 323
   })
 
-  sprites.cashier.bubble = new SpeechBubble({offsY: -414});
+  sprites.cashier.bubble = new SpeechBubble({offsY: -205});
 
   // ENVIRONMENT
 
@@ -153,6 +154,15 @@ function preloadSprites() {
     hAlign: 0,
     vAlign: 0,
     zOrder: -100
+  })
+
+  sprites.occultCircle = new Sprite({
+    frames: {
+      default: loadImage("assets/env/Occult_Circle.png")
+    },
+    x: 592,
+    y: 478,
+    zOrder: -1
   })
 
   // INTERACTIBLES
@@ -230,6 +240,7 @@ function preloadSprites() {
     x: 1311,
     y: 194,
     radius: 100,
+    times: [true, true, false],
     targetScene: "market",
     targetX: 1482,
     targetFacing: false
@@ -301,7 +312,7 @@ function preloadScenes() {
   });
   
   scenes.bar = new Scene({
-    background: loadImage("assets/env/Bar.png"),
+    background: loadImage("assets/env/bar.png"),
     scale: 0.5,
     camxMax: 4200/2,
     floor: 534,
@@ -331,8 +342,6 @@ function preloadScenes() {
     xMax: 1671,
   });
 
-  scenes.vip = new Scene({});
-
   scenes.office = new Scene({
     background: loadImage("assets/env/Office.png"),
     scale: 0.5,
@@ -341,11 +350,21 @@ function preloadScenes() {
     xMin: 54,
     xMax: 910,
   });
+
+  scenes.vip = new Scene({
+    background: loadImage("assets/env/VIP_Room.png"),
+    scale: 0.5,
+    camxMax: 2500/2,
+    floor: 534,
+    xMin: 93,
+    xMax: 1200,
+  });
 }
 
 function setupConversations() {
   conversation.data = {
     intro: [
+      {who:"dottie", goTo: 200},
       {narrate: "The dame walked into my office."},
       {narrate: "Not a Dane, mind you.\nThat would be a dog.\nShe was a sheep."},
       {who:"dottie", say:"You're... detective Dunnet?"},
@@ -366,9 +385,11 @@ function setupConversations() {
       {who:"player", say:"Certainly. I'll prepare my investigation immediately."},
       {who:"dottie", say:"Thank you..."},
       {narrate: "As powerful as the artifact was, it couldn't erase a murder. That would only cause a paradox."},
+      {who:"dottie", goTo: -100},
       {narrate: "It would be enough to catch the perpetrator, and give some closure to the little lamb."},
       {narrate: "There’s no time like the present, especially when your future is in the past."},
       {narrate: "I’ll loop back to noon this morning and see what I can find."},
+      {switchScene:"town", x:100, flip:true},
     ],
     changeTime: function() {
       switch (currentDaytime) {
@@ -400,7 +421,7 @@ function setupConversations() {
     },
     museBossName: [
       {who: "player", say: "This rival gang leader must be the killer. I’ve got to get in there and see the evidence for myself."},
-      {permFlag: "bossNme", val: "2"}
+      {permFlag: "bossName", val: "2"}
     ],
     talkDealer: function() {
       if (tempFlags.dealerConv) {
@@ -440,7 +461,45 @@ function setupConversations() {
     talkDealer2: [
       {who: "dealer", say:"Hey, thanks for not arresting me!"}
     ],
+    talkGuard: function() {
+      if (sprites.player.curVariant == "vest" && permFlags.bossName)
+        return "bouncerConv2"
+      return "bouncerConv1"
+    },
+    bouncerConv1: [
+      {who: "guard", say:"VIP members only, bud. Scram."}
+    ],
+    bouncerConv2: [
+      {who: "guard", say:"VIP members only, bud. Scram."},
+      {who: "player", say:"That’s no way to talk to your boss."},
+      {who: "guard", say:"Wha- Mr. Smith?"},
+      {who: "player", say:"The one and only, Brutus. Now let me in, I need to talk to the boss."},
+      {who: "guard", say:"Yes, sir!"},
+      {narrate: "TO BE CONTINUED!!!!!!!!!!!"},
+    ],
+    talkCashier: function() {
+      if (tempFlags.labConv)
+        return "labConv2"
+      else
+        return "labConv1"
+    },
+    labConv1: [
+      {who: "cashier", say:"What would you like?"},
+      {who: "player", tempFlag:"choice", choices:["Robe","Vest"]},
+      {ifTemp:"choice", eq:0, setVariant:"robe"},
+      {ifTemp:"choice", eq:1, setVariant:"vest"},
+      {tempFlag:"labConv", val:"1"}
+    ],
+    labConv2: [
+      {who: "player", say:"I must ask, miss, have you seen anything strange in town? Any unusual occurrences?"},
+      {who: "cashier", say:"Well, there’s a kid who spends hours in the park next door late at night every now and then. No idea what she’s up to."},
+      {who: "player", say: "(I thanked the dame for her time and went on my way.)"},
+      {who: "cashier", say: "I’m a black lab, actually."},
+      {who: "player", say: "(No, not Dane, dame… am I talking out loud?)"}
+    ],
     talkCat: function() {
+      if (tempFlags.catDone)
+        return "catDone"
       if (tempFlags.catBan)
         return "catBan"
       if (sprites.player.curVariant === "robe")
@@ -462,8 +521,8 @@ function setupConversations() {
       {who: "cat", say:"Contacting the dead! There’s loads of spirits all around here. Can you hear them?"},
       {who: "player", say: " I do have excellent ears."},
       {who: "cat", anim:"jump", say:"WHAT? Really? Ask them what I’m thinking of so I know you’re not faking!"},
-      {who: "player", ifPerm: "catCloak", eq: "", tempFlag: "choice", choice: ["I'm not sure"]},
-      {who: "player", ifPerm: "catCloak", eq: "1", tempFlag: "choice", choice: ["I'm not sure", "Your awesome cloak"]},
+      {who: "player", ifPerm: "catCloak", eq: undefined, tempFlag: "choice", choices: ["I'm not sure"]},
+      {who: "player", ifPerm: "catCloak", eq: "1", tempFlag: "choice", choices: ["I'm not sure", "Your awesome cloak"]},
       {ifTemp:"choice", eq:"0", transfer:"catUnimpressed"},
       {ifTemp:"choice", eq:"1", transfer:"catImpressed"}
     ],
@@ -476,11 +535,36 @@ function setupConversations() {
     catImpressed: [
       {who: "cat", anim: "jump", say:"WHAT? You’re for real? That’s so cool! You’re way better than the last guy I asked to join the club."},
       {who: "player", say:"And who was this?"},
-      {who: "cat", anim: "happy", say:"He was this really grumpy rabbit, kinda like you. But he had a different vest on."},
-      {who: "cat", anim: "happy", say:"It wasn’t the official uniform, but I gave him a try anyway."},
+      {who: "cat", anim: "default", say:"He was this really grumpy rabbit, kinda like you. But he had a different vest on."},
+      {who: "cat", say:"It wasn’t the official uniform, but I gave him a try anyway."},
       {who: "cat", say:"But he sucked! Now only uniform-wearing members are allowed in the club."},
       {who: "cat", anim: "default"},
+      {tempFlag: "catDone", val: "1"},
       {permFlag: "bossVest", val: "1"}
+    ],
+    catDone: [
+      {who: "cat", say:"See you later, member!"},
+    ],
+    unfinished: [
+      {narrate:"NOT FINISHED SORRY"}
+    ],
+    outroConv1: [
+      {who: "ace", say:"Who are you? How did you get past the bouncer?"},
+      {who: "player", say:"Mr. Lewis? You’re… alive?"},
+      {who: "ace", say:"What is that supposed to mean?"},
+      {who: "player", say:"Never mind. You’re in grave danger, sir -"},
+      {who: "dottie"},
+      {who: "player", say:"Dottie?!"},
+      {who: "dottie", say:"Good evening, Mr. Dunnet. Thank you for taking care of the bouncer for me."},
+      {who: "player", say:"But… why?"},
+      {who: "dottie", say:"You think I like being married to a mob boss? The money was nice at first, but Ace’s temper is something you never want to be on the wrong side of."},
+      {who: "dottie", say:"I was trapped in a loop, Dunnet. You should understand."},
+      {who: "player", say:"You can’t be serious. I’m an eyewitness."},
+      {who: "dottie", say:"And there are 20 other eyewitnesses who see me outside this door right now. My alibi is airtight, thanks to you."},
+    //Dottie walks off
+      {who: "dottie", say:"Farewell, Dunnet. I hope we meet in better circumstances someday."},
+    
+      
     ]
   }
 }
@@ -520,7 +604,7 @@ function setupScenes(time) {
       //sprites.dottie.y = scenes.town.floor;
       break;
     case 2:
-      scenes.park.addSprites([sprites.cat]);
+      scenes.park.addSprites([sprites.cat, sprites.occultCircle]);
       break;
   }
 

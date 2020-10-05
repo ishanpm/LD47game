@@ -181,7 +181,7 @@ class Sprite {
     this.invisible = config.invisible || false;
     this.opacity = 255;
     this.imageScale = config.scale || 0.5;
-    this.flipx = false;
+    this.flipx = ifUndef(config.flipX, false);
     
     this.x = config.x || 0;
     this.y = config.y || 0;
@@ -290,6 +290,7 @@ class Interactible extends Sprite {
     this.targetFacing = config.targetFacing;
     this.targetConversation = config.targetConversation || null;
 
+    this.times = ifUndef(config.times, null)
     this.inRange = false;
     this.opacity = 0;
     this.revealSpeed = 20;
@@ -307,6 +308,10 @@ class Interactible extends Sprite {
                     (abs(player.x - this.x) < this.radius) &&
                     !(inTransition || conversation.curConversation));
     
+    if (this.times) {
+      this.inRange = this.inRange && this.times[currentDaytime];
+    }
+
     this.opacity = constrain(this.opacity + (this.inRange ? this.revealSpeed : -this.revealSpeed), 0, 255);
     
     if (this.inRange && (input.buttons.accept.pressed || input.buttons.up.pressed) && !conversation.curConversation) {
@@ -459,10 +464,19 @@ class Character extends Sprite {
     
     this.walkFrames = config.walkFrames;
     this.dx = 0;
+    this.targetX = null;
     this.walking = false;
+    this.speed = ifUndef(config.speed, 7);
+
   }
   
   tick() {
+    if (this.targetX !== null) {
+      this.dx = constrain(this.targetX - this.x, -this.speed, this.speed);
+    } else {
+      this.dx = 0;
+    }
+
     // Start/end walk cycle
     if (this.dx !== 0 && !this.walking) {
       this.walking = true;
@@ -486,20 +500,16 @@ class Character extends Sprite {
 class Player extends Character {
   constructor(config) {
     super(config);
-    
-    this.speed = config.speed || 10;
   }
   
   tick() {
-    this.dx = 0;
-    
-    if (!(inTransition || conversation.curConversation)) {
-      if (input.buttons.left.held ) this.dx -= this.speed;
-      if (input.buttons.right.held) this.dx += this.speed;
-    }
-
     if (this.scene) {
-      this.dx = constrain(this.dx, this.scene.xMin - this.x, this.scene.xMax - this.x);
+      this.targetX = null;
+
+      if (!(inTransition || conversation.curConversation)) {
+        if (input.buttons.left.held ) this.targetX = this.scene.xMin;
+        if (input.buttons.right.held) this.targetX = this.scene.xMax;
+      }
     }
     
     super.tick();
@@ -521,7 +531,13 @@ function setup() {
   
   setupConversations();
   setupScenes(0);
-  setScene("town", 100);
+
+  setScene("office", 849, false);
+  sprites.dottie.setScene(scenes.office);
+  sprites.dottie.x = -100;
+  sprites.dottie.y = scenes.office.floor;
+
+  conversation.playConversation("intro")
   
   fadeout = 255;
 }
@@ -579,6 +595,7 @@ function setDaytime(nextTime) {
   if (nextTime === 0) {
     // Reset the clock
     tempFlags = {};
+    sprites.player.curVariant = null;
   } else {
     // don't do that i guess
   }

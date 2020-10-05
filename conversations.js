@@ -60,7 +60,7 @@ class ConversationManager {
     if (step.ifTemp) {
       stepActive = stepActive && tempFlags[step.ifTemp] == step.eq
     } else if (step.ifPerm) {
-      stepActive = stepActive && tempFlags[step.ifPerm] == step.eq
+      stepActive = stepActive && permFlags[step.ifPerm] == step.eq
     }
 
     if (stepActive) {
@@ -102,6 +102,16 @@ class ConversationManager {
         character.startAnimation(step.anim);
       }
 
+      // Walk
+      if (step.goTo !== undefined) {
+        character.targetX = step.goTo;
+      }
+
+      // Variant
+      if (step.setVariant !== undefined) {
+        sprites.player.curVariant = step.setVariant;
+      }
+
       // Set flags
       if (step.tempFlag) {
         tempFlags[step.tempFlag] = step.val;
@@ -113,15 +123,19 @@ class ConversationManager {
       if (step.setTime !== undefined) {
         switchDayime(step.setTime);
       }
+    
+      if (step.transfer) {
+        this.convStep = -1;
+        this.curConversation = this.data[step.transfer];
+      }
+
+      if (step.switchScene) {
+        switchScene(step.switchScene, step.x, step.flip)
+      }
     }
     
     this.lastStep = step;
     this.convStep++;
-    
-    if (step.transfer) {
-      this.convStep = 0;
-      this.curConversation = this.data[step.transfer];
-    }
 
     if (!stepWait) {
       // Do another step
